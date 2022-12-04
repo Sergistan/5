@@ -1,7 +1,10 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -20,13 +23,11 @@ public class Main2 {
         List<Employee> list = parseXML("data.xml");
         String json = listToJson(list);
         writeString(json);
-
     }
 
     private static List<Employee> parseXML(String s) throws ParserConfigurationException, IOException, SAXException {
 
-        List<Employee> employees = null;
-        List<String> valueAttr = new ArrayList<>();
+        List<Employee> employees = new ArrayList<>();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse(new File(s));
@@ -38,14 +39,14 @@ public class Main2 {
             Node node_ = nodeList.item(i);
             if (Node.ELEMENT_NODE == node_.getNodeType()) {
                 Element element = (Element) node_;
-                String textContent = element.getTextContent();
-                valueAttr.add(textContent);
-            } else {
-                     continue;       //рекурсия
+                String id = element.getElementsByTagName("id").item(0).getTextContent();
+                String firstName = element.getElementsByTagName("firstName").item(0).getTextContent();
+                String lastName = element.getElementsByTagName("lastName").item(0).getTextContent();
+                String country = element.getElementsByTagName("country").item(0).getTextContent();
+                String age = element.getElementsByTagName("age").item(0).getTextContent();
+                Employee employee = new Employee(Long.parseLong(id), firstName, lastName, country, Integer.parseInt(age));
+                employees.add(employee);
             }
-            Object[] objects = valueAttr.toArray();
-            Employee employee = new Employee((long)(objects[0]), (String)(objects[1]), (String)(objects[2]), (String)(objects[3]), (int)(objects[4]));
-            employees.add(employee);
         }
         return employees;
     }
